@@ -1,20 +1,19 @@
 import "regenerator-runtime/runtime";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoremData, setLoading } from "../store/loremSlice";
+import { setPosts, setLoading } from "../store/loremSlice";
 
 const App = () => {
-  const data = useSelector((store) => store.lorem.data);
+  const posts = useSelector((store) => store.lorem.posts);
   const loading = useSelector((store) => store.lorem.loading);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
-      dispatch(setLoading(true));
       try {
-        const res = await fetch(`https://lorem-api.com/api/lorem`);
-        const result = await res.text();
-        dispatch(setLoremData(result));
+        const res = await fetch(`https://api.lorem.com/ipsum`);
+        const result = await res.json();
+        dispatch(setPosts(result));
       } catch (error) {
         console.error("Fetch failed:", error);
       } finally {
@@ -25,7 +24,27 @@ const App = () => {
     fetchData();
   }, [dispatch]);
 
-  return <div>{loading ? <p>Loading...</p> : <p>{data}</p>}</div>;
+  return (
+    <div>
+      <h1>Intro Text</h1>
+      {loading ? (
+        <h4 id="loading">Loading...</h4>
+      ) : (
+        <ul>
+          {posts.map((post, index) => (
+            <li key={index}>
+              <p>
+                <strong>Title:</strong> {post.title}
+              </p>
+              <p>
+                <strong>Body:</strong> {post.body}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 };
 
 export default App;
